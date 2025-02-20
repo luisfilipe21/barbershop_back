@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,10 +8,50 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  name String @db.VarChar(255)
-  phone String @db.VarChar(11)
+  id    Int     @id @default(autoincrement())
+  name  String  @db.VarChar(255)
+  email String  @unique
+  phone String? @db.VarChar(11)
+  role  String  @default("client")
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Schedule    Schedule[]
+  Appointment Appointment[]
+}
+
+model Schedule {
+  id          Int      @id @default(autoincrement())
+  barberId    Int
+  date        DateTime
+  isAvailable Boolean  @default(true)
+
+  barber      User          @relation(fields: [barberId], references: [id])
+  timeSlots   TimeSlot[]
+  Appointment Appointment[]
+}
+
+model TimeSlot {
+  id         Int     @id @default(autoincrement())
+  scheduleId Int
+  startTime  String
+  endTime    String
+  isBooked   Boolean @default(false)
+
+  schedule    Schedule      @relation(fields: [scheduleId], references: [id])
+  Appointment Appointment[]
+}
+
+model Appointment {
+  id         Int      @id @default(autoincrement())
+  clientId   Int
+  scheduleId Int
+  timeSlotId Int
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+
+  client   User     @relation(fields: [clientId], references: [id])
+  schedule Schedule @relation(fields: [scheduleId], references: [id])
+  timeSlot TimeSlot @relation(fields: [timeSlotId], references: [id])
 }

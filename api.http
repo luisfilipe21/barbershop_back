@@ -1,0 +1,46 @@
+###
+# @name user1
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+    "name": "Luis 3",
+    "phone": "61982072434",
+    "email": "luis3@gmail.com",
+    "role": "admin"
+}
+
+###
+# @name loginPartner1
+GET http://localhost:3000/users
+Content-Type: application/json
+
+###
+# @name loginPartner1
+GET http://localhost:3000/users/1
+Content-Type: application/json
+
+
+
+###
+# @name updateUser
+PATCH http://localhost:3000/users/2
+Content-Type: application/json
+
+{
+    "id": 2,
+    "name": "Luis 2",
+    "phone": "61982072434",
+    "email": "luis2@gmail.com"
+}
+
+###
+# @name updateUser
+PATCH http://localhost:3000/users/1
+Content-Type: application/json
+
+{
+    "id": 1,
+    "name": "Luis",
+    "email": "luis@gmail.com"
+}
