@@ -8,50 +8,58 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  name  String  @db.VarChar(255)
-  email String  @unique
-  phone String? @db.VarChar(11)
-  role  String  @default("client")
+  id       Int     @id @default(autoincrement())
+  name     String  @db.VarChar(255)
+  password String
+  email    String  @unique
+  phone    String? @db.VarChar(11)
+  role     Role    @default(CLIENT)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Schedule    Schedule[]
-  Appointment Appointment[]
+  Schedule Schedule[]
+}
+
+model Barber {
+  id       Int     @id @default(autoincrement())
+  name     String  @db.VarChar(255)
+  password String
+  email    String  @unique
+  phone    String? @db.VarChar(11)
+  role     Role    @default(BARBER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Schedule      Schedule[]
+  AvailableTime AvailableTime[]
 }
 
 model Schedule {
-  id          Int      @id @default(autoincrement())
-  barberId    Int
-  date        DateTime
-  isAvailable Boolean  @default(true)
+  id       Int      @id @default(autoincrement())
+  date     DateTime
+  userId   Int
+  barberId Int
 
-  barber      User          @relation(fields: [barberId], references: [id])
-  timeSlots   TimeSlot[]
-  Appointment Appointment[]
+  user        User    @relation(fields: [userId], references: [id])
+  barber      Barber  @relation(fields: [barberId], references: [id])
+  isAvailable Boolean @default(true)
 }
 
-model TimeSlot {
-  id         Int     @id @default(autoincrement())
-  scheduleId Int
-  startTime  String
-  endTime    String
-  isBooked   Boolean @default(false)
+model AvailableTime {
+  id        Int      @id @default(autoincrement())
+  barberId  Int
+  barber    Barber   @relation(fields: [barberId], references: [id])
+  date      DateTime
+  startTime String
+  endTime   String
+  createdAt DateTime @default(now())
 
-  schedule    Schedule      @relation(fields: [scheduleId], references: [id])
-  Appointment Appointment[]
+  @@unique([barberId, date, startTime]) 
 }
 
-model Appointment {
-  id         Int      @id @default(autoincrement())
-  clientId   Int
-  scheduleId Int
-  timeSlotId Int
-  status     String   @default("pending")
-  createdAt  DateTime @default(now())
-
-  client   User     @relation(fields: [clientId], references: [id])
-  schedule Schedule @relation(fields: [scheduleId], references: [id])
-  timeSlot TimeSlot @relation(fields: [timeSlotId], references: [id])
+enum Role {
+  CLIENT
+  BARBER
 }

@@ -1,5 +1,5 @@
-import { prisma } from "../../config/database";
-import { ISchedule, ITimeSlot } from "./schedule.interfaces";
+import { prisma } from "../config/database";
+import { ISchedule, ITimeSlot } from "../interface/schedule.interfaces";
 
 
 export class ScheduleRepository {

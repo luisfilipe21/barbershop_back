@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { UserServices } from "./user.services";
+import { UserServices } from "../services/user.services";
 
 export class UserController {
   private userServices = new UserServices();
@@ -14,10 +14,9 @@ export class UserController {
   };
 
   findOne = async (req: Request, res: Response) => {
-    const user = await this.userServices.findOne(Number(req.params.id));
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
-    }
+    const decoded  = Number(req.params.id);
+    const user = await this.userServices.findOne(decoded);
+
     res.status(201).json(user);
   };
 
@@ -30,7 +29,8 @@ export class UserController {
   };
 
   delete = async (req: Request, res: Response) => {
-    const user = await this.userServices.findOne(Number(req.params.id));
+    const { decodedId } = res.locals;
+    const user = await this.userServices.findOne(decodedId);
     if (!user) {
       res.status(404).json({ message: "User not found" });
     }

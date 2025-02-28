@@ -1,9 +1,11 @@
+import { hash } from "bcrypt";
 import { prisma } from "../../config/database";
-import { IUpdateUser, IUser, IUserCreate } from "./user.interfaces";
+import { IUser, IUserCreate, IUserReturn, IUserUpdate } from "./user.interfaces";
 
 export class UserServices {
   create = async (payload: IUserCreate): Promise<IUser> => {
-    return await prisma.user.create({ data: payload });
+    payload.password = await hash(payload.password, 10);
+    return await prisma.user.create({data: payload});
   };
 
   findAll = async (): Promise<IUser[]> => {
@@ -24,8 +26,11 @@ export class UserServices {
 
   updateUser = async (
     userId: number,
-    payload: IUpdateUser
+    payload: IUserUpdate
   ): Promise<IUser | null> => {
+
+    if(payload.password) await hash(payload.password, 10) 
+
     const updateUser = await prisma.user.update({
       where: { id: Number(userId) },
       data: { ...payload },
