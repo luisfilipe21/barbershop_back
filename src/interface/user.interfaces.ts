@@ -1,4 +1,3 @@
-import { Role } from "@prisma/client";
 
 export interface IUser {
   id: number;
@@ -6,7 +5,6 @@ export interface IUser {
   password: string;
   phone?: string | null;
   email: string;
-  role: Role;
 
   createdAt: Date;
   updatedAt: Date;
@@ -17,7 +15,6 @@ export interface IUserCreate {
   password: string;
   phone?: string;
   email: string;
-  role: Role;
 }
 
 export interface IUserUpdate {

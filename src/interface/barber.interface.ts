@@ -1,4 +1,4 @@
-import { AvailableTime, Role, Schedule } from "@prisma/client";
+import { AvailableTime, Schedule } from "@prisma/client";
 
 export interface IBarber {
   id: number;
@@ -6,7 +6,7 @@ export interface IBarber {
   password: string;
   email: string;
   phone?: string | null;
-  role: Role;
+  
 
   createdAt: Date;
   updatedAt: Date;
@@ -20,7 +20,7 @@ export interface IBarberCreate {
   password: string;
   email: string;
   phone?: string;
-  role: Role;
+  
 
 }
 

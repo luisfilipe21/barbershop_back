@@ -1,9 +1,10 @@
 import { hash } from "bcrypt";
-import { prisma } from "../../config/database";
-import { IUser, IUserCreate, IUserReturn, IUserUpdate } from "./user.interfaces";
+import { IUser, IUserCreate, IUserUpdate } from "../interface/user.interfaces";
+import { prisma } from "../config/database";
 
 export class UserServices {
   create = async (payload: IUserCreate): Promise<IUser> => {
+    
     payload.password = await hash(payload.password, 10);
     return await prisma.user.create({data: payload});
   };

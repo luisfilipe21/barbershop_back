@@ -1,6 +1,6 @@
 import { hash } from "bcrypt";
-import { prisma } from "../../config/database";
-import { IBarber, IBarberCreate, IBarberUpdate } from "./barber.interface";
+import { IBarber, IBarberCreate, IBarberUpdate } from "../interface/barber.interface";
+import { prisma } from "../config/database";
 
 export class BarberServices {
   create = async (payload: IBarberCreate): Promise<IBarber> => {

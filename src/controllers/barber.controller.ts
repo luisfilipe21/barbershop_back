@@ -1,10 +1,20 @@
 import { Request, Response } from "express";
 import { BarberServices } from "../services/barber.service";
+import { barberCreateSchema } from "../schema/barber.schemas";
+import { ZodError } from "zod";
 
 export class BarberController {
   private  barberService = new BarberServices();
 
   create = async (req: Request, res: Response) => {
+    try {
+      req.body = barberCreateSchema.parse(req.body);
+    } catch (error) {
+      if(error instanceof ZodError) {
+        res.status(400).json({error: error.message})
+      }
+      console.log(error);
+    }
     const barber = await this.barberService.create(req.body);
 
     res.status(201).json(barber);

@@ -13,7 +13,6 @@ model User {
   password String
   email    String  @unique
   phone    String? @db.VarChar(11)
-  role     Role    @default(CLIENT)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -27,7 +26,6 @@ model Barber {
   password String
   email    String  @unique
   phone    String? @db.VarChar(11)
-  role     Role    @default(BARBER)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -57,9 +55,4 @@ model AvailableTime {
   createdAt DateTime @default(now())
 
   @@unique([barberId, date, startTime]) 
-}
-
-enum Role {
-  CLIENT
-  BARBER
 }

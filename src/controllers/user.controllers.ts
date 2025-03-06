@@ -1,10 +1,18 @@
 import { Request, Response } from "express";
 import { UserServices } from "../services/user.services";
+import { userCreateSchema } from "../schema/user.schemas";
 
 export class UserController {
   private userServices = new UserServices();
 
   create = async (req: Request, res: Response) => {
+    try{
+
+      req.body = userCreateSchema.parse(req.body)
+    }catch(error){
+      console.log(error);
+    }
+
     const user = await this.userServices.create(req.body);
     res.status(201).json(user);
   };
