@@ -1,14 +1,14 @@
+import { Role } from "@prisma/client";
 import { z } from "zod";
 
 export const userSchema = z.object({
   id: z.number().positive(),
-  name: z.string().min(2).max(30),
-  password: z.string(),
-  phone: z.string().nullish(),
-  email: z.string().email(),
-  role: z.string(),
-
-  createdAt: z.date(),
+  name: z.string().min(2).max(100),
+  password: z.string().min(6).max(100),
+  phone: z.string().nullable(),
+  email: z.string().email().min(2),
+  role: z.nativeEnum(Role).default(Role.CLIENT),
+  createdAt: z.date().default(new Date()),
   updatedAt: z.date(),
 });
 
@@ -19,3 +19,5 @@ export const userCreateSchema = userSchema.omit({
 });
 export const userUpdateSchema = userCreateSchema.partial();
 export const userReturnSchema = userCreateSchema.omit({ password: true });
+
+export const loginUser = userCreateSchema.pick({ email: true, password: true });

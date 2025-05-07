@@ -1,23 +1,23 @@
-import { prisma } from "../config/database";
+// import { prisma } from "../config/database";
 
-export class AvailableTimeService {
+// export class AvailableTimeService {
   
-  listAllAvailableTime = async (barberId: number, date: string) => {
-    return await prisma.availableTime.findMany({
-      where: { barberId, date: new Date(date) },
-    });
-  };
+//   listAllAvailableTime = async (userId: number, date: string) => {
+//     return await prisma.wordDay.findMany({
+//       where: { userId, date: new Date(date) },
+//     });
+//   };
 
-  setAvailableTime = async (
-    barberId: number,
-    date: string,
-    startTime: string,
-    endTime: string) => {
+//   setAvailableTime = async (
+//     userId: number,
+//     date: string,
+//     startTime: string,
+//     endTime: string) => {
 
 
 
-    return await prisma.availableTime.create({
-        data: { barberId, date: new Date(date), startTime, endTime },
-      });
-  }
-}
+//     return await prisma.availableTime.create({
+//         data: { userId, date: new Date(date), startTime, endTime },
+//       });
+//   }
+// }

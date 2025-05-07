@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Schedule" ALTER COLUMN "date" SET NOT NULL,
+ALTER COLUMN "date" SET DATA TYPE TEXT;

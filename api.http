@@ -4,27 +4,58 @@ POST http://localhost:3000/users
 Content-Type: application/json
 
 {
-    "name": "Luis 4",
+    "name": "Luis 18",
     "phone": "61982072434",
-    "email": "luis4@gmail.com",
-    "role": "CLIENT"
+    "email": "luis18@gmail.com",
+    "password":"123456",
+    "role": "BARBER"
 }
 
 ###
-# @name loginPartner1
+# @name loginBarber
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email": "luis18@gmail.com",
+    "password":"123456"
+}
+###
+
+# @name loginClient
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email": "luis2@gmail.com",
+    "password":"123456"
+}
+
+###
+# @name getAll
 GET http://localhost:3000/users
 Content-Type: application/json
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTHVpcyAxOCIsImVtYWlsIjoibHVpczE4QGdtYWlsLmNvbSIsInJvbGUiOiJCQVJCRVIiLCJpYXQiOjE3NDYxOTEwODEsImV4cCI6MTc0NjIwOTA4MSwic3ViIjoiMTUifQ.2JSzAGNqOSG0OyL8wKskj50lE2tHd20ayCKQNAeiPCY
 
 ###
-# @name loginPartner1
-GET http://localhost:3000/users/1
+# @name getOneUser
+GET http://localhost:3000/users/schedule/15
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTHVpcyAxOCIsImVtYWlsIjoibHVpczE4QGdtYWlsLmNvbSIsInJvbGUiOiJCQVJCRVIiLCJpYXQiOjE3NDY0NTM0MTcsImV4cCI6MTc0NjQ3MTQxNywic3ViIjoiMTUifQ.P1ewzfHwvCdzuyDEsGH4IMbSwrQFGCEb_MQrDB53gOM
 
 
 ###
-# @name updateUser
+# @name getOneClient
+GET http://localhost:3000/users/3
+Content-Type: application/json
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTHVpcyAyLjAiLCJlbWFpbCI6Imx1aXMyQGdtYWlsLmNvbSIsInJvbGUiOiJDTElFTlQiLCJpYXQiOjE3NDY0NTAzNTMsImV4cCI6MTc0NjQ2ODM1Mywic3ViIjoiMiJ9.pA-ZcW0Yv4hUETN7qP2NQgGEyjekkNvZRNcC92kehdY
+
+
+###
+# @name updateUserClient
 PATCH http://localhost:3000/users/2
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTHVpcyAyLjAiLCJlbWFpbCI6Imx1aXMyQGdtYWlsLmNvbSIsInJvbGUiOiJDTElFTlQiLCJpYXQiOjE3NDY0NTAyODEsImV4cCI6MTc0NjQ2ODI4MSwic3ViIjoiMiJ9.Jo4iDdfT2nsP9QsIRZZL1jHiomnoRX_K-tSF3JqXcag
 
 {
     "id": 2,
@@ -37,6 +68,7 @@ Content-Type: application/json
 # @name updateUser
 PATCH http://localhost:3000/users/1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTHVpcyAxOCIsImVtYWlsIjoibHVpczE4QGdtYWlsLmNvbSIsInJvbGUiOiJCQVJCRVIiLCJpYXQiOjE3NDYxOTEwODEsImV4cCI6MTc0NjIwOTA4MSwic3ViIjoiMTUifQ.2JSzAGNqOSG0OyL8wKskj50lE2tHd20ayCKQNAeiPCY
 
 {
     "id": 1,

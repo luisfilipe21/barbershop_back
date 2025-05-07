@@ -1,27 +1,53 @@
-import { prisma } from "../../config/database";
-import { GoogleCalendarService } from "../googleCalendar/GoogleCalendarService";
+import { prisma } from "../config/database";
 
-const googleCalendarService = new GoogleCalendarService();
 export class ScheduleService {
-  selfSchedule = async (
-    barberId: number,
-    date: Date,
-    time: string
+  createSchedule = async (
+    userId: number,
+    data: string,
+    startTime: string,
+    endTime: string
   ) => {
-    const availableTime = await prisma.availableTime.findFirst({
-      where: { barberId, date: new Date(date), startTime: time },
+    const schedule = await this.listSchedule(userId);
+
+    schedule.map((day) => {
+      if (day.date === data && day.startTime == startTime)
+        throw new Error("You already have a schedule for that day");
     });
 
-    if(!availableTime) {
-      throw new Error("Esse horário já está preenchido.");
-    }
+    const daysOfWork = await prisma.schedule.create({
+      data: {
+        userId,
+        date: data,
+        startTime,
+        endTime,
+      },
+    });
 
+    return daysOfWork;
   };
 
-  listScheduleForBarber = async (barberId: number) => {
+  listSchedule = async (userId: number) => {
     return await prisma.schedule.findMany({
-      where: { barberId },
-      orderBy: { date: "asc" },
+      where: { userId, isAvailable: true },
+    });
+  };
+
+  updateAvailability = async (userId: number, isAvailable: boolean) => {
+    const updateSchedule = await prisma.schedule.update({
+      where: { id: userId },
+      data: { isAvailable },
+    });
+    return updateSchedule;
+  };
+
+  setScheduleTimeClient = async (
+    userID: number,
+    date: string,
+    startTime: string
+  ) => {
+    const isDate = new Date();
+    const dayOfAppointment = await prisma.schedule.findUnique({
+      where: { id: userID, date: isDate.toISOString() },
     });
   };
 }

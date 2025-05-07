@@ -8,25 +8,12 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  name     String  @db.VarChar(255)
-  password String
-  email    String  @unique
-  phone    String? @db.VarChar(11)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  Schedule Schedule[]
-}
-
-model Barber {
-  id       Int     @id @default(autoincrement())
-  name     String  @db.VarChar(255)
-  password String
-  email    String  @unique
-  phone    String? @db.VarChar(11)
-
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  password  String
+  email     String   @unique
+  phone     String?  @db.VarChar(11)
+  role      Role     @default(CLIENT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -35,24 +22,29 @@ model Barber {
 }
 
 model Schedule {
-  id       Int      @id @default(autoincrement())
-  date     DateTime
-  userId   Int
-  barberId Int
+  id          Int        @id @default(autoincrement())
+  date        String 
+  startTime   String
+  endTime     String
+  isAvailable Boolean    @default(true)
 
-  user        User    @relation(fields: [userId], references: [id])
-  barber      Barber  @relation(fields: [barberId], references: [id])
-  isAvailable Boolean @default(true)
+  userId        Int
+  user          User            @relation(fields: [userId], references: [id])
+  AvailableTime AvailableTime[]
 }
 
 model AvailableTime {
-  id        Int      @id @default(autoincrement())
-  barberId  Int
-  barber    Barber   @relation(fields: [barberId], references: [id])
-  date      DateTime
-  startTime String
-  endTime   String
-  createdAt DateTime @default(now())
+  id     Int @id @default(autoincrement())
 
-  @@unique([barberId, date, startTime]) 
+  userId Int
+  user       User     @relation(fields: [userId], references: [id])
+  scheduleId Int
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  service    String
+}
+
+enum Role {
+  BARBER
+  CLIENT
+  ADMIN
 }
