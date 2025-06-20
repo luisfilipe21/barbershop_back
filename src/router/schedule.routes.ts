@@ -6,8 +6,8 @@ import { isBarber } from "../middlewares/accountRole.middleware";
 export const scheduleRoute = Router()
 const scheduleController = new ScheduleController();
 
-scheduleRoute.get("/:barberId", scheduleController.getBarberSchedule)
+scheduleRoute.get("/:id", scheduleController.getBarberSchedule)
 
 scheduleRoute.use(authMiddleware, isBarber)
-scheduleRoute.patch("/:barberId/availability", scheduleController.updateAvailability)
-scheduleRoute.post("/:barberId", scheduleController.create)
+scheduleRoute.patch("/:id/availability", scheduleController.updateAvailability)
+scheduleRoute.post("/:id", scheduleController.create)

@@ -28,8 +28,9 @@ export class ScheduleController {
   };
 
   getBarberSchedule = async (req: Request, res: Response) => {
-    const barberId = Number(res.locals.decodedAccountData.sub);
-    
+    // const barberId = Number(res.locals.decodedAccountData.sub);
+    const barberId = Number(req.params.id);
+
     const schedule = await this.scheduleService.listSchedule(barberId);
     res.status(200).json(schedule);
   };

@@ -11,7 +11,7 @@ userRouter.post("/", userController.create);
 userRouter.get("/", userController.findAll);
 userRouter.get("/:id", userController.findOne);
 
-userRouter.use(authMiddleware, isBarber);
-userRouter.patch("/:id", userController.update);
+userRouter.use(authMiddleware);
+userRouter.patch("/:id", isBarber, userController.update);
 
 userRouter.delete("/:id", isAdmin, userController.delete);

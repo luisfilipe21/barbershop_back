@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { UserServices } from "../services/user.services";
 import { userCreateSchema } from "../schema/user.schemas";
-import { ZodError } from "zod";
+
 
 export class UserController {
   private userServices = new UserServices();

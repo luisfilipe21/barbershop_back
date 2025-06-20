@@ -7,6 +7,7 @@ export class LoginService {
   private userServices = new UserServices();
 
   login = async (payload: ILogin) => {
+    
     const validUser = await this.userServices.sameEmail(payload.email);
 
     if (!validUser) throw new Error("Invalid user");
@@ -22,6 +23,7 @@ export class LoginService {
       { name: validUser.name, email: validUser.email, role: validUser.role },
       validUser.id
     );
+    
     return token;
   };
 }

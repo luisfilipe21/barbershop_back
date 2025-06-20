@@ -17,5 +17,6 @@ export const authMiddleware = (
   const accountData = verifyToken(token);
   res.locals.decodedAccountData = accountData;
   console.log(accountData);
+  console.log("accountData");
   next();
 };
