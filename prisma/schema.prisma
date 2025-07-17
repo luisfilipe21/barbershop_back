@@ -22,11 +22,11 @@ model User {
 }
 
 model Schedule {
-  id          Int        @id @default(autoincrement())
-  date        String 
-  startTime   String
-  endTime     String
-  isAvailable Boolean    @default(true)
+  id          Int      @id @default(autoincrement())
+  date        DateTime @db.Timestamp(3)
+  startTime   DateTime @db.Timestamp(3)
+  endTime     DateTime @db.Timestamp(3)
+  isAvailable Boolean  @default(true)
 
   userId        Int
   user          User            @relation(fields: [userId], references: [id])
@@ -34,9 +34,9 @@ model Schedule {
 }
 
 model AvailableTime {
-  id     Int @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  userId Int
+  userId     Int
   user       User     @relation(fields: [userId], references: [id])
   scheduleId Int
   schedule   Schedule @relation(fields: [scheduleId], references: [id])

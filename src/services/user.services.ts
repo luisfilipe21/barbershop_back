@@ -5,18 +5,17 @@ import { ConflictError } from "../errors/AppError";
 
 export class UserServices {
   sameEmail = async (email: string) => {
-    return await prisma.user.findUnique({ where: { email } });
-  }
-
-  // isUserBarber = async (userid: number, user: ) => {
-      //isso vai ser um middleware 
-  // }
+    return await prisma.user.findUnique({
+      where: { email },
+      include: { Schedule: true },
+    });
+  };
 
   create = async (payload: IUserCreate): Promise<IUser> => {
     payload.password = await hash(payload.password, 10);
 
     const sameEmail = await this.sameEmail(payload.email);
-    if(sameEmail) throw new ConflictError("Email already exists");
+    if (sameEmail) throw new ConflictError("Email already exists");
 
     return await prisma.user.create({ data: payload });
   };
@@ -45,7 +44,7 @@ export class UserServices {
 
     const updateUser = await prisma.user.update({
       where: { id: Number(userId) },
-      data: { ...payload}
+      data: { ...payload },
     });
 
     if (!updateUser) {

@@ -12,6 +12,6 @@ export const generateToken = (payload: Object = {}, userId: number) => {
 export const verifyToken = (token: string) => {
   const secret = process.env.JWT_SECRETS as string;
   const accountDataJwt = verify(token, secret);
-  console.log(accountDataJwt)
+
   return accountDataJwt;
 };

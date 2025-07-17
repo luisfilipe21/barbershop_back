@@ -17,6 +17,6 @@ app.use(cors());
 
 app.use("/login", loginRouter);
 app.use("/users", userRouter);
-app.use("/barbers", scheduleRoute);
+app.use("/users/schedule", scheduleRoute);
 
 app.use(handleGlobalErrors);

@@ -17,7 +17,7 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-    "email": "luis18@gmail.com",
+    "email": "l@mail.com",
     "password":"123456"
 }
 ###
@@ -74,3 +74,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTHVpcyAxO
     "name": "Luis",
     "email": "luis@gmail.com"
 }
+
+###
+# @name getScheduleUser
+GET http://localhost:3000/users/schedule/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTHVpcyBGaWxpcGUiLCJlbWFpbCI6ImxAbWFpbC5jb20iLCJyb2xlIjoiQkFSQkVSIiwic2NoZWR1bGUiOlt7ImlkIjo2MiwiZGF0ZSI6IjIwMjUtMDctMTBUMDM6MDA6MDAuMDAwWiIsInN0YXJ0VGltZSI6IjIwMjUtMDctMTBUMTM6NTU6MDAuMDAwWiIsImVuZFRpbWUiOiIyMDI1LTA3LTEwVDE0OjU1OjAwLjAwMFoiLCJpc0F2YWlsYWJsZSI6dHJ1ZSwidXNlcklkIjoxfSx7ImlkIjo2MywiZGF0ZSI6IjIwMjUtMTAtMDdUMDM6MDA6MDAuMDAwWiIsInN0YXJ0VGltZSI6IjIwMTAtMDctMjBUMTM6NTU6MDAuMDAwWiIsImVuZFRpbWUiOiIyMDEwLTA3LTIwVDE0OjU1OjAwLjAwMFoiLCJpc0F2YWlsYWJsZSI6dHJ1ZSwidXNlcklkIjoxfSx7ImlkIjo2NCwiZGF0ZSI6IjIwMjUtMDctMTFUMDM6MDA6MDAuMDAwWiIsInN0YXJ0VGltZSI6IjIwMjUtMDctMTFUMTU6MDg6MDAuMDAwWiIsImVuZFRpbWUiOiIyMDI1LTA3LTExVDE2OjA4OjAwLjAwMFoiLCJpc0F2YWlsYWJsZSI6dHJ1ZSwidXNlcklkIjoxfSx7ImlkIjo2NSwiZGF0ZSI6IjIwMjUtMDctMTBUMDM6MDA6MDAuMDAwWiIsInN0YXJ0VGltZSI6IjIwMjUtMDctMTBUMTQ6MjQ6MDAuMDAwWiIsImVuZFRpbWUiOiIyMDI1LTA3LTEwVDE1OjI0OjAwLjAwMFoiLCJpc0F2YWlsYWJsZSI6dHJ1ZSwidXNlcklkIjoxfSx7ImlkIjo2MSwiZGF0ZSI6IjIwMjUtMDctMTBUMDM6MDA6MDAuMDAwWiIsInN0YXJ0VGltZSI6IjIwMjUtMDctMTBUMTM6NTM6MDAuMDAwWiIsImVuZFRpbWUiOiIyMDI1LTA3LTEwVDE0OjUzOjAwLjAwMFoiLCJpc0F2YWlsYWJsZSI6dHJ1ZSwidXNlcklkIjoxfV0sImlhdCI6MTc1MjI0NDIwMSwiZXhwIjoxNzUyMjYyMjAxLCJzdWIiOiIxIn0.VQpEnknBWLV5gXVni58-vcK6sy5crCC8jw14nvTbV7E
+
+# {
+#     "id": 1,
+#     "name": "Luis",
+#     "email": "luis@gmail.com"
+# }

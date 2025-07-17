@@ -1,4 +1,6 @@
+import moment from "moment";
 import { prisma } from "../config/database";
+import { ISchedule } from "../interface/schedule.interfaces";
 
 export class ScheduleService {
   createSchedule = async (
@@ -6,23 +8,56 @@ export class ScheduleService {
     data: string,
     startTime: string,
     endTime: string
-  ) => {
+  ): Promise<ISchedule> => {
+    const [dia, mes, ano] = data.split("/");
+    const fullDate = `${ano}-${mes}-${dia}`;
+
+    const startDateTimeString = moment(
+      `${fullDate} ${startTime}`,
+      "YYYY-MM-DD HH:mm"
+    );
+    const endDateTimeString = moment(
+      `${fullDate} ${endTime}`,
+      "YYYY-MM-DD HH:mm"
+    );
+
+    if (!startDateTimeString.isValid() || !endDateTimeString.isValid()) {
+      throw new Error("As datas ou horas fornecidas são inválidas.");
+    }
+
+    if (!startDateTimeString || !endDateTimeString) {
+      throw new Error("As datas ou horas fornecidas são inválidas. 2");
+    }
+
+    if (startDateTimeString.isAfter(endDateTimeString)) {
+      throw new Error(
+        "A hora de início não pode ser igual ou posterior à hora de término."
+      );
+    }
+
     const schedule = await this.listSchedule(userId);
 
-    schedule.map((day) => {
-      if (day.date === data && day.startTime == startTime)
-        throw new Error("You already have a schedule for that day");
+    schedule.forEach((item) => {
+      if (item.date.getDate() === new Date(fullDate).getDate()) {
+        if (
+          startDateTimeString.isSame(item.startTime) ||
+          startDateTimeString.isSame(item.startTime)
+        ) {
+          throw new Error("O horário escolhido já foi agendado.");
+        }
+      }
     });
 
     const daysOfWork = await prisma.schedule.create({
       data: {
         userId,
-        date: data,
-        startTime,
-        endTime,
+        date: new Date(fullDate),
+        startTime: new Date(startDateTimeString.toISOString()),
+        endTime: new  Date(endDateTimeString.toString()),
       },
     });
-
+    console.log(daysOfWork)
+    // return daysOfWork;
     return daysOfWork;
   };
 
