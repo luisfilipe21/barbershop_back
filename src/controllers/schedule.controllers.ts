@@ -45,43 +45,25 @@ export class ScheduleController {
     const timeNow = moment(getTimeNow, "HH:mm:ss").format("HH:mm");
     const isTimeAvailable: ISchedule[] = [];
 
-    schedule.sort((a, b) => {
-      const dataA = moment(a.date, "DD/MM/YYYY");
-      const dataB = moment(b.date, "DD/MM/YYYY");
-
-      if (dataA.isAfter(dataB)) return 1;
-      if (dataA.isBefore(dataB)) return -1;
-      return 0;
-    });
-
-    schedule.map((item) => {
-      if (
-        moment(item.date).format("DD/MM/YYYY") >=
-        moment(getTimeNow).format("DD/MM/YYYY")
-      )
-        isTimeAvailable.push(item);
-      {
+    schedule.filter((item) => {
+      if (moment(item.date).format("DD/MM/YYYY") >= moment(getTimeNow).format("DD/MM/YYYY")){
+        // isTimeAvailable.push(item);
         if (moment(item.startTime, "HH:mm:ss").format("HH:mm") >= timeNow) {
           isTimeAvailable.push(item);
-        } else {
-          return null;
+          return
         }
       }
     });
 
-    res.status(200).json(isTimeAvailable);
+    const setDateStraight = isTimeAvailable.sort(
+      (a, b) => moment(a.date).valueOf() - moment(b.date).valueOf()
+    );
+
+    // const setTimeStraight = setDateStraight.sort(
+    //   (a, b) => moment(b.startTime).valueOf() - moment(a.startTime).valueOf()
+    // );
+
+    res.status(200).json(setDateStraight);
   };
 
-  // Fazer depois do frontend
-  // setScheduleTimeClient = async (req: Request, res: Response) => {
-  //   const {sub: barberId, date: barberScheduleDate} = res.locals.decodedAccountData;
-
-  //   const timeSelected = barberScheduleDate.startingTime;
-  //   const daySelected = barberScheduleDate.date;
-
-  //   // Fazer com que os dados selecionados venham da tabela do schedule por meio do .map()
-
-  //   const reservedTime = await this.scheduleService.setScheduleTimeClient(barberId, daySelected, timeSelected);
-  //   res.status(201).json(reservedTime)
-  // }
 }
