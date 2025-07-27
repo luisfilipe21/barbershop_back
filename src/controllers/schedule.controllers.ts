@@ -47,7 +47,6 @@ export class ScheduleController {
 
     schedule.filter((item) => {
       if (moment(item.date).format("DD/MM/YYYY") >= moment(getTimeNow).format("DD/MM/YYYY")){
-        // isTimeAvailable.push(item);
         if (moment(item.startTime, "HH:mm:ss").format("HH:mm") >= timeNow) {
           isTimeAvailable.push(item);
           return
@@ -59,11 +58,16 @@ export class ScheduleController {
       (a, b) => moment(a.date).valueOf() - moment(b.date).valueOf()
     );
 
-    // const setTimeStraight = setDateStraight.sort(
-    //   (a, b) => moment(b.startTime).valueOf() - moment(a.startTime).valueOf()
-    // );
-
     res.status(200).json(setDateStraight);
   };
 
+  getBarberScheduleByUser = async (req: Request, res: Response) => {
+    const barberId = req.body.userId;
+
+    const fetchBarberSchedule = await this.scheduleService.listBarberSchedule(
+      barberId
+    );
+    res.status(200).json(fetchBarberSchedule);
+
+  }
 }

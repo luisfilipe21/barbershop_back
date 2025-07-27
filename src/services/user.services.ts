@@ -1,7 +1,13 @@
 import { hash } from "bcrypt";
-import { IUser, IUserCreate, IUserUpdate } from "../interface/user.interfaces";
+import {
+  IUser,
+  IUserCreate,
+  IUserReturn,
+  IUserUpdate,
+} from "../interface/user.interfaces";
 import { prisma } from "../config/database";
 import { ConflictError } from "../errors/AppError";
+import { userReturnSchema } from "../schema/user.schemas";
 
 export class UserServices {
   sameEmail = async (email: string) => {
@@ -28,12 +34,17 @@ export class UserServices {
     });
   };
 
-  findOne = async (userId: number): Promise<IUser> => {
-    const foundUser = await prisma.user.findFirst({ where: { id: userId } });
+  findOne = async (userId: number): Promise<IUserReturn> => {
+    const foundUser = await prisma.user.findFirst({
+      where: { id: userId },
+      include: { Schedule: true },
+    })
     if (!foundUser) {
       throw new Error();
     }
-    return foundUser;
+    
+    const parsedUser = userReturnSchema.parse(foundUser);
+    return parsedUser;
   };
 
   updateUser = async (

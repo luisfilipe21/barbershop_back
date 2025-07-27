@@ -1,5 +1,6 @@
 import { Role } from "@prisma/client";
 import { z } from "zod";
+import { scheduleSchema } from "./schedule.schema";
 
 export const userSchema = z.object({
   id: z.number().positive(),
@@ -18,6 +19,7 @@ export const userCreateSchema = userSchema.omit({
   updatedAt: true,
 });
 export const userUpdateSchema = userCreateSchema.partial();
-export const userReturnSchema = userCreateSchema.omit({ password: true });
+
+export const userReturnSchema = userCreateSchema.omit({ password: true }).extend({Schedule: z.array(scheduleSchema)});
 
 export const loginUser = userCreateSchema.pick({ email: true, password: true });

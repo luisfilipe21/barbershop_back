@@ -7,11 +7,13 @@ export class LoginService {
   private userServices = new UserServices();
 
   private secret = process.env.JWT_SECRET || "secreta";
-  
+
   verifyToken = async (token: string) => {
     try {
       return jwt.verify(token, this.secret);
     } catch (error) {
+      console.log("-----------------------");
+      console.log(error);
       return null;
     }
   };
@@ -27,11 +29,35 @@ export class LoginService {
     );
     if (!decryptedPassword) throw new Error("Invalid credentials");
 
-    const token = generateToken(
-      { name: validUser.name, email: validUser.email, role: validUser.role, schedule: validUser.Schedule },
-      validUser.id
-    );
-
-    return token;
+    if (validUser.role === "CLIENT") {
+      return generateToken(
+        {
+          name: validUser.name,
+          role: validUser.role,
+          schedule: validUser.Schedule,
+        },
+        validUser.id
+      );
+    }
+    if (validUser.role === "BARBER") {
+      return generateToken(
+        {
+          name: validUser.name,
+          email: validUser.email,
+          role: validUser.role,
+          schedule: validUser.Schedule,
+        },
+        validUser.id
+      );
+    }
+    if (validUser.role === "ADMIN") {
+      return generateToken(
+        {
+          name: validUser.name,
+          role: validUser.role,
+        },
+        validUser.id
+      );
+    }
   };
 }

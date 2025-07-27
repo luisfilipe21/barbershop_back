@@ -15,3 +15,15 @@ export class ConflictError extends AppError {
     super(statusCode, message);
   }
 }
+
+export class JsonWebTokenError extends AppError {
+  constructor(public message: string, public readonly statusCode: number = 401) {
+    super(statusCode, message);
+  }
+}
+
+export class ZodError extends AppError {
+  constructor(public message: string, public readonly statusCode: number = 400) {
+    super(statusCode, message);
+  }
+}

@@ -1,8 +1,8 @@
 export interface ISchedule {
   id?: number;
-  scheduleId?: number;
+  userId?: number;
   date: Date;
   startTime: Date;
   endTime: Date;
-  isBooked?: boolean;
+  isAvailable?: boolean;
 }

@@ -13,7 +13,6 @@ export class UserController {
     }catch(error){
 
         console.log(error);
-        console.log("dasdasd error");
     }
 
     const user = await this.userServices.create(req.body);

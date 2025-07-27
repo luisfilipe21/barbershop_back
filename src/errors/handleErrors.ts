@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { AppError } from "./AppError";
 import { ZodError } from "zod";
+import { JsonWebTokenError } from "jsonwebtoken";
 
 export const handleGlobalErrors = (
   error: Error,
@@ -17,6 +18,9 @@ export const handleGlobalErrors = (
         res.status(400).json(error.message);
     }
     
+    if (error instanceof JsonWebTokenError){
+        res.status(401).json({ error: "Unauthorized" });
+    }
 
     res.status(500).json({ error: "Internal Server Error" });
 };

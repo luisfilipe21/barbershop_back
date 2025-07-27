@@ -1,6 +1,7 @@
 import moment from "moment";
 import { prisma } from "../config/database";
 import { ISchedule } from "../interface/schedule.interfaces";
+import { ScheduleController } from "../controllers/schedule.controllers";
 
 export class ScheduleService {
   createSchedule = async (
@@ -53,11 +54,9 @@ export class ScheduleService {
         userId,
         date: new Date(fullDate),
         startTime: new Date(startDateTimeString.toISOString()),
-        endTime: new  Date(endDateTimeString.toString()),
+        endTime: new Date(endDateTimeString.toString()),
       },
     });
-    console.log(daysOfWork)
-    // return daysOfWork;
     return daysOfWork;
   };
 
@@ -65,6 +64,13 @@ export class ScheduleService {
     return await prisma.schedule.findMany({
       where: { userId, isAvailable: true },
     });
+  };
+
+  listBarberSchedule = async (userId: number) => {
+    return await prisma.schedule.findFirst({
+      where: { userId, isAvailable: true }
+    });
+
   };
 
   updateAvailability = async (userId: number, isAvailable: boolean) => {

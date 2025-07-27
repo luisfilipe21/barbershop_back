@@ -14,13 +14,11 @@ export class LoginController {
 
   autoLogin = async (req: Request, res: Response) => {
     const authHeader = req.headers.authorization;
-
     if(!authHeader){
       res.status(401).json({ error: "Unauthorized" });
     }
 
      const [, token] = authHeader!.split(' ');
-
     const decoded = verifyToken(token);
 
     if(!decoded){
