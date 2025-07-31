@@ -12,7 +12,6 @@ export class LoginService {
     try {
       return jwt.verify(token, this.secret);
     } catch (error) {
-      console.log("-----------------------");
       console.log(error);
       return null;
     }
@@ -39,6 +38,7 @@ export class LoginService {
         validUser.id
       );
     }
+
     if (validUser.role === "BARBER") {
       return generateToken(
         {
@@ -50,6 +50,7 @@ export class LoginService {
         validUser.id
       );
     }
+
     if (validUser.role === "ADMIN") {
       return generateToken(
         {
@@ -60,4 +61,5 @@ export class LoginService {
       );
     }
   };
+  
 }

@@ -1,7 +1,7 @@
 import moment from "moment";
 import { prisma } from "../config/database";
 import { ISchedule } from "../interface/schedule.interfaces";
-import { ScheduleController } from "../controllers/schedule.controllers";
+import { IUserReturn } from "../interface/user.interfaces";
 
 export class ScheduleService {
   createSchedule = async (
@@ -68,9 +68,28 @@ export class ScheduleService {
 
   listBarberSchedule = async (userId: number) => {
     return await prisma.schedule.findFirst({
-      where: { userId, isAvailable: true }
+      where: { userId, isAvailable: true },
+    });
+  };
+
+  listBarberScheduleByUser = async (userId: number): Promise<IUserReturn> => {
+    const schedule = await prisma.schedule.findMany({
+      where: { userId, isAvailable: true },
     });
 
+    const barber = await prisma.user.findFirst({
+      where: {id: userId}, 
+    })
+
+    const barberSchedule = {
+      name: barber!.name,
+      email: barber!.email,
+      phone: barber!.phone,
+      role: barber!.role,
+      Schedule: schedule
+    }
+
+    return barberSchedule
   };
 
   updateAvailability = async (userId: number, isAvailable: boolean) => {

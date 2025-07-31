@@ -46,10 +46,13 @@ export class ScheduleController {
     const isTimeAvailable: ISchedule[] = [];
 
     schedule.filter((item) => {
-      if (moment(item.date).format("DD/MM/YYYY") >= moment(getTimeNow).format("DD/MM/YYYY")){
+      if (
+        moment(item.date).format("DD/MM/YYYY") >=
+        moment(getTimeNow).format("DD/MM/YYYY")
+      ) {
         if (moment(item.startTime, "HH:mm:ss").format("HH:mm") >= timeNow) {
           isTimeAvailable.push(item);
-          return
+          return;
         }
       }
     });
@@ -64,10 +67,34 @@ export class ScheduleController {
   getBarberScheduleByUser = async (req: Request, res: Response) => {
     const barberId = req.body.userId;
 
-    const fetchBarberSchedule = await this.scheduleService.listBarberSchedule(
+
+    const fetchBarberSchedule = await this.scheduleService.listBarberScheduleByUser(
       barberId
     );
-    res.status(200).json(fetchBarberSchedule);
 
-  }
+
+    const getTimeNow = new Date();
+    const timeNow = moment(getTimeNow, "HH:mm:ss").format("HH:mm");
+    const isTimeAvailable: ISchedule[] = [];
+
+    fetchBarberSchedule!.Schedule.filter((item) => {
+      if (
+        moment(item.date).format("DD/MM/YYYY") >=
+        moment(getTimeNow).format("DD/MM/YYYY")
+      ) {
+        if (moment(item.startTime, "HH:mm:ss").format("HH:mm") >= timeNow) {
+          isTimeAvailable.push(item as ISchedule);
+          return;
+        }
+      }
+    });
+
+    const setDateStraight = isTimeAvailable.sort(
+      (a, b) => moment(a.date).valueOf() - moment(b.date).valueOf()
+    );
+    
+    const updatedBarberSchedule = {...fetchBarberSchedule, Schedule: setDateStraight}
+    
+    res.status(200).json(updatedBarberSchedule);
+  };
 }

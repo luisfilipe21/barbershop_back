@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { UserController } from "../controllers/user.controllers";
 import { authMiddleware } from "../middlewares/auth.middleware";
-import { isAdmin, isBarber } from "../middlewares/accountRole.middleware";
+import { isBarber } from "../middlewares/accountRole.middleware";
 
 export const userRouter = Router();
 
@@ -13,5 +13,4 @@ userRouter.get("/:id", userController.findOne);
 
 // userRouter.use(authMiddleware);
 userRouter.patch("/:id", isBarber, userController.update);
-
 userRouter.delete("/:id", isBarber, userController.delete);

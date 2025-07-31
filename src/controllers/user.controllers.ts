@@ -8,7 +8,6 @@ export class UserController {
 
   create = async (req: Request, res: Response) => {
     try{
-
       req.body = userCreateSchema.parse(req.body)
     }catch(error){
 

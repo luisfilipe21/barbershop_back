@@ -7,9 +7,13 @@ export const scheduleRoute = Router();
 const scheduleController = new ScheduleController();
 
 scheduleRoute.get(
-  "/:id",
-  // isClient,
+  "/client/:id",
   scheduleController.getBarberScheduleByUser
+);
+
+scheduleRoute.get(
+  "/:id",
+  scheduleController.getBarberSchedule
 );
 
 // scheduleRoute.use(authMiddleware, isBarber);

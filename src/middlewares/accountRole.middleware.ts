@@ -15,11 +15,11 @@ export const isClient = (req:Request, res:Response, next: NextFunction) => {
     next()
 }
 
-export const isAdmin = (req:Request, res:Response, next: NextFunction) => {
-    const {role} = res.locals.decodedAccountData
-    if(role !== "ADMIN"){
-        throw new Error("Só Admins podem estar aqui, parça. Volte uma casa 3")
-    }
+// export const isAdmin = (req:Request, res:Response, next: NextFunction) => {
+//     const {role} = res.locals.decodedAccountData
+//     if(role !== "ADMIN"){
+//         throw new Error("Só Admins podem estar aqui, parça. Volte uma casa 3")
+//     }
     
-    next()
-}
+//     next()
+// }
