@@ -33,7 +33,7 @@ export class LoginService {
         {
           name: validUser.name,
           role: validUser.role,
-          schedule: validUser.Schedule,
+          Schedule: validUser.Schedule,
         },
         validUser.id
       );
@@ -45,7 +45,7 @@ export class LoginService {
           name: validUser.name,
           email: validUser.email,
           role: validUser.role,
-          schedule: validUser.Schedule,
+          Schedule: validUser.Schedule,
         },
         validUser.id
       );
