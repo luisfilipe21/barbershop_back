@@ -85,8 +85,6 @@ export class ScheduleController {
         }
       }
     });
-    // console.log(fetchBarberSchedule);
-    console.log(isTimeAvailable);
 
     const setDateStraight = isTimeAvailable.sort(
       (a, b) => moment(a.date).valueOf() - moment(b.date).valueOf()
