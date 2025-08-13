@@ -11,6 +11,8 @@ export class LoginController {
 
   autoLogin = async (req: Request, res: Response) => {
     const authHeader = req.headers.authorization;
+    console.log(authHeader);
+    
     if (!authHeader) {
       res.status(401).json({ error: "Unauthorized" });
     }

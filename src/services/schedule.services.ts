@@ -2,6 +2,8 @@ import moment from "moment";
 import { prisma } from "../config/database";
 import { ISchedule } from "../interface/schedule.interfaces";
 import { IUserReturn } from "../interface/user.interfaces";
+import { AppError, ZodError } from "../errors/AppError";
+import { IClient } from "../interface/client.interfaces";
 
 export class ScheduleService {
   createSchedule = async (
@@ -23,15 +25,15 @@ export class ScheduleService {
     );
 
     if (!startDateTimeString.isValid() || !endDateTimeString.isValid()) {
-      throw new Error("As datas ou horas fornecidas são inválidas.");
+      throw new ZodError("As datas ou horas fornecidas são inválidas.");
     }
 
     if (!startDateTimeString || !endDateTimeString) {
-      throw new Error("As datas ou horas fornecidas são inválidas. 2");
+      throw new ZodError("As datas ou horas fornecidas são inválidas. 2");
     }
 
     if (startDateTimeString.isAfter(endDateTimeString)) {
-      throw new Error(
+      throw new ZodError(
         "A hora de início não pode ser igual ou posterior à hora de término."
       );
     }
@@ -44,7 +46,7 @@ export class ScheduleService {
           startDateTimeString.isSame(item.startTime) ||
           startDateTimeString.isSame(item.startTime)
         ) {
-          throw new Error("O horário escolhido já foi agendado.");
+          throw new ZodError("O horário escolhido já foi agendado.");
         }
       }
     });
@@ -78,18 +80,18 @@ export class ScheduleService {
     });
 
     const barber = await prisma.user.findFirst({
-      where: {id: userId}, 
-    })
+      where: { id: userId },
+    });
 
     const barberSchedule = {
       name: barber!.name,
       email: barber!.email,
       phone: barber!.phone,
       role: barber!.role,
-      Schedule: schedule
-    }
+      Schedule: schedule,
+    };
 
-    return barberSchedule
+    return barberSchedule;
   };
 
   updateAvailability = async (userId: number, isAvailable: boolean) => {
@@ -100,14 +102,16 @@ export class ScheduleService {
     return updateSchedule;
   };
 
-  setScheduleTimeClient = async (
-    userID: number,
+  getScheduleTimeClient = async (
+    userId: number,
     date: string,
     startTime: string
-  ) => {
-    const isDate = new Date();
-    const dayOfAppointment = await prisma.schedule.findUnique({
-      where: { id: userID, date: isDate.toISOString() },
-    });
+  ) : Promise<IUserReturn>=> {
+   
+    const data = this.listBarberScheduleByUser(userId);
+
+    console.log(data)
+
+    return data
   };
 }

@@ -9,7 +9,6 @@ export const handleGlobalErrors = (
   res: Response,
   next: NextFunction
 ) => {
-    console.log(error)
     
     if(error instanceof AppError){
         res.status(error.statusCode).json(error.message);

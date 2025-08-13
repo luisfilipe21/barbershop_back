@@ -15,7 +15,7 @@ scheduleRoute.get(
   "/:id",
   scheduleController.getBarberSchedule
 );
-
+scheduleRoute.get("/clientTimeSlot/:id", scheduleController.getClientTimeSlot);
 // scheduleRoute.use(authMiddleware, isBarber);
 scheduleRoute.patch("/:id/availability", scheduleController.updateAvailability);
 scheduleRoute.post("/:id", scheduleController.create);

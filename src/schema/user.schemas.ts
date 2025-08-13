@@ -22,4 +22,6 @@ export const userUpdateSchema = userCreateSchema.partial();
 
 export const userReturnSchema = userCreateSchema.omit({ password: true }).extend({Schedule: z.array(scheduleSchema)});
 
+export const userReturnTimeSlot = userSchema.omit({password: true, createdAt: true, updatedAt: true, email: true, }).extend({Schedule: z.array(scheduleSchema)})
+
 export const loginUser = userCreateSchema.pick({ email: true, password: true });

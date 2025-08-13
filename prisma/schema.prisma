@@ -31,6 +31,7 @@ model Schedule {
   userId        Int
   user          User            @relation(fields: [userId], references: [id])
   AvailableTime AvailableTime[]
+  clients       Client[]
 }
 
 model AvailableTime {
@@ -41,6 +42,16 @@ model AvailableTime {
   scheduleId Int
   schedule   Schedule @relation(fields: [scheduleId], references: [id])
   service    String
+}
+
+model Client {
+  id       Int @id @default(autoincrement())
+  barberId Int
+
+  name     String
+  email    String
+  phone    String
+  schedule Schedule[]
 }
 
 enum Role {
