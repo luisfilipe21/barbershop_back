@@ -3,9 +3,12 @@ import { prisma } from "../config/database";
 import { ISchedule } from "../interface/schedule.interfaces";
 import { IUserReturn } from "../interface/user.interfaces";
 import { AppError, ZodError } from "../errors/AppError";
-import { IClient } from "../interface/client.interfaces";
+import { GoogleCalendarService } from "./GoogleCalendarService";
+import { oAuthClientFromTokens } from "../oAuth2/oAuth2.middleware";
 
 export class ScheduleService {
+  private googleCalendarService = new GoogleCalendarService();
+
   createSchedule = async (
     userId: number,
     data: string,
@@ -37,6 +40,16 @@ export class ScheduleService {
         "A hora de início não pode ser igual ou posterior à hora de término."
       );
     }
+    const hasConflict =
+      await this.googleCalendarService.handleCalendarConflicts(
+        userId,
+        startDateTimeString.toISOString(),
+        endDateTimeString.toISOString()
+      );
+
+    if (hasConflict) {
+      throw new ZodError("O horário escolhido conflita com outro agendamento.");
+    }
 
     const schedule = await this.listSchedule(userId);
 
@@ -59,6 +72,20 @@ export class ScheduleService {
         endTime: new Date(endDateTimeString.toString()),
       },
     });
+
+    const googleEventId =
+      await this.googleCalendarService.createCalendarEventForBarber(
+        userId,
+        "Horário disponível",
+        startDateTimeString.toISOString(),
+        endDateTimeString.toISOString()
+      );
+
+    await prisma.schedule.update({
+      where: { id: daysOfWork.id },
+      data: { googleEventId },
+    });
+
     return daysOfWork;
   };
 
@@ -69,9 +96,7 @@ export class ScheduleService {
   };
 
   listBarberSchedule = async (userId: number) => {
-    return await prisma.schedule.findFirst({
-      where: { userId, isAvailable: true },
-    });
+    return await this.googleCalendarService.listCalendarEventsForBarber(userId);
   };
 
   listBarberScheduleByUser = async (userId: number): Promise<IUserReturn> => {
@@ -102,16 +127,85 @@ export class ScheduleService {
     return updateSchedule;
   };
 
+  updateSchedule = async (
+    scheduleId: number,
+    newDate: string,
+    newStart: string,
+    newEnd: string
+  ) => {
+    const schedule = await prisma.schedule.findUnique({
+      where: { id: scheduleId },
+    });
+
+    if (!schedule) throw new Error("Horário não encontrado");
+
+    const barberId = schedule.userId;
+
+    const [dia, mes, ano] = newDate.split("/");
+    const fullDate = `${ano}-${mes}-${dia}`;
+
+    const startISO = moment(
+      `${fullDate} ${newStart}`,
+      "YYYY-MM-DD HH:mm"
+    ).toISOString();
+    const endISO = moment(
+      `${fullDate} ${newEnd}`,
+      "YYYY-MM-DD HH:mm"
+    ).toISOString();
+
+    const calendar = new GoogleCalendarService();
+
+    const updatedEvent = {
+      summary: "Horário disponível",
+      startISO: startISO,
+      endISO: endISO,
+    };
+
+    await this.googleCalendarService.updateCalendarEventForBarber(
+      barberId,
+      schedule.googleEventId!,
+      updatedEvent
+    );
+
+    return await prisma.schedule.update({
+      where: { id: scheduleId },
+      data: {
+        date: new Date(fullDate),
+        startTime: new Date(startISO),
+        endTime: new Date(endISO),
+      },
+    });
+  };
+
   getScheduleTimeClient = async (
     userId: number,
     date: string,
     startTime: string
-  ) : Promise<IUserReturn>=> {
-   
+  ): Promise<IUserReturn> => {
     const data = this.listBarberScheduleByUser(userId);
 
-    console.log(data)
+    console.log(data);
 
-    return data
+    return data;
+  };
+
+  deleteSchedule = async (scheduleId: number) => {
+    const schedule = await prisma.schedule.findUnique({
+      where: { id: scheduleId },
+    });
+
+    if (!schedule) throw new Error("Horário não encontrado");
+
+    if (schedule.googleEventId) {
+      await this.googleCalendarService.deleteCalendarEventForBarber(
+        schedule.userId,
+        schedule.googleEventId
+      );
+    }
+
+    await prisma.schedule.delete({
+      where: { id: scheduleId },
+    });
+    return true;
   };
 }

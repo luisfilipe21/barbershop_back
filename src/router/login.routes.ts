@@ -5,4 +5,4 @@ export const loginRouter = Router();
 const loginController = new LoginController();
 
 loginRouter.post("/", loginController.login)
-loginRouter.post("/autologin", loginController.autoLogin)
+loginRouter.get("/autologin", loginController.autoLogin)

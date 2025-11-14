@@ -13,21 +13,21 @@ export class ConflictError extends AppError {
     public message: string,
     public readonly statusCode: number = 409
   ) {
-    console.log("conflicterror")
+    console.log("conflict error")
     super(statusCode, message);
   }
 }
 
 export class JsonWebTokenError extends AppError {
   constructor(public message: string, public readonly statusCode: number = 401) {
-    console.log("jwterror")
+    console.log("jwt error")
     super(statusCode, message);
   }
 }
 
 export class ZodError extends AppError {
   constructor(public message: string, public readonly statusCode: number = 400) {
-    console.log("zoderror")
+    console.log("zod error")
     super(statusCode, message);
   }
 }

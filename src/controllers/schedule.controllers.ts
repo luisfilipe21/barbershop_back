@@ -40,15 +40,14 @@ export class ScheduleController {
     const barberId = Number(req.params.id);
 
     const schedule = await this.scheduleService.listSchedule(barberId);
-
     const getTimeNow = new Date();
     const timeNow = moment(getTimeNow, "HH:mm:ss").format("HH:mm");
     const isTimeAvailable: ISchedule[] = [];
 
     schedule.filter((item) => {
       if (
-        moment(item.date).format("DD/MM/YYYY") >=
-        moment(getTimeNow).format("DD/MM/YYYY")
+        moment(item.date).format("YYYY/MM/DD") >=
+        moment(getTimeNow).format("YYYY/MM/DD")
       ) {
         if (moment(item.startTime, "HH:mm:ss").format("HH:mm") >= timeNow) {
           isTimeAvailable.push(item);
@@ -60,7 +59,6 @@ export class ScheduleController {
     const setDateStraight = isTimeAvailable.sort(
       (a, b) => moment(a.date).valueOf() - moment(b.date).valueOf()
     );
-
     res.status(200).json(setDateStraight);
   };
 
@@ -68,7 +66,7 @@ export class ScheduleController {
     const barberId = req.body.userId;
     const fetchBarberSchedule =
       await this.scheduleService.listBarberScheduleByUser(barberId);
-
+    console.log(fetchBarberSchedule);
     const getTimeNow = new Date();
     const timeNow = moment(getTimeNow, "HH:mm:ss").format("HH:mm");
     const isTimeAvailable: ISchedule[] = [];
@@ -129,8 +127,6 @@ export class ScheduleController {
       Schedule: setDateStraight,
     };
 
-  res.status(200).json(updatedBarberSchedule);
-
+    res.status(200).json(updatedBarberSchedule);
   };
-
 }

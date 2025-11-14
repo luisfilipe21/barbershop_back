@@ -18,30 +18,30 @@ model User {
   updatedAt DateTime @updatedAt
 
   Schedule      Schedule[]
-  AvailableTime AvailableTime[]
+}
+
+model Barber {
+  id       Int  @id @default(autoincrement())
+  name     String
+  email    String? @unique
+  phone    String?
+  googleId String? @unique
+
+  googleTokens Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Schedule {
-  id          Int      @id @default(autoincrement())
-  date        DateTime @db.Timestamp(3)
-  startTime   DateTime @db.Timestamp(3)
-  endTime     DateTime @db.Timestamp(3)
-  isAvailable Boolean  @default(true)
+  id            Int      @id @default(autoincrement())
+  date          DateTime @db.Timestamp(3)
+  startTime     DateTime @db.Timestamp(3)
+  endTime       DateTime @db.Timestamp(3)
+  isAvailable   Boolean  @default(true)
+  googleEventId String?
 
   userId        Int
   user          User            @relation(fields: [userId], references: [id])
-  AvailableTime AvailableTime[]
-  clients       Client[]
-}
-
-model AvailableTime {
-  id Int @id @default(autoincrement())
-
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id])
-  scheduleId Int
-  schedule   Schedule @relation(fields: [scheduleId], references: [id])
-  service    String
 }
 
 model Client {
@@ -51,7 +51,6 @@ model Client {
   name     String
   email    String
   phone    String
-  schedule Schedule[]
 }
 
 enum Role {

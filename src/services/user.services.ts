@@ -6,7 +6,7 @@ import {
   IUserUpdate,
 } from "../interface/user.interfaces";
 import { prisma } from "../config/database";
-import { ConflictError } from "../errors/AppError";
+import { AppError, ConflictError } from "../errors/AppError";
 import { userReturnSchema } from "../schema/user.schemas";
 
 export class UserServices {
@@ -38,15 +38,14 @@ export class UserServices {
     const foundUser = await prisma.user.findFirst({
       where: { id: userId },
       include: { Schedule: true },
-    })
+    });
     if (!foundUser) {
       throw new Error();
     }
-    
+
     const parsedUser = userReturnSchema.parse(foundUser);
     return parsedUser;
   };
-
   updateUser = async (
     userId: number,
     payload: IUserUpdate

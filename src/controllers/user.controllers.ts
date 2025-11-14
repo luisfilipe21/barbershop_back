@@ -10,11 +10,12 @@ export class UserController {
     try{
       req.body = userCreateSchema.parse(req.body)
     }catch(error){
-
         console.log(error);
     }
 
+    
     const user = await this.userServices.create(req.body);
+
     res.status(201).json(user);
   };
 

@@ -62,4 +62,8 @@ export class LoginService {
     }
   };
   
-}
+  getUser = async (id: number) => {
+    const user = await this.userServices.findOne(id);
+    return user
+  }
+};
