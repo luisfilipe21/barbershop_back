@@ -5,17 +5,8 @@ import { IUserReturn } from "../interface/user.interfaces";
 import { AppError, ZodError } from "../errors/AppError";
 import { GoogleCalendarService } from "./GoogleCalendarService";
 
-
-
-
 export class ScheduleService {
   constructor(private readonly googleCalendarService: GoogleCalendarService) {}
-
-  listSchedule = async (userId: number) => {
-    return await prisma.schedule.findMany({
-      where: { userId, isAvailable: true },
-    });
-  };
 
   createSchedule = async (
     userId: number,
@@ -23,7 +14,6 @@ export class ScheduleService {
     startTime: string,
     endTime: string
   ): Promise<ISchedule> => {
-    
     const [dia, mes, ano] = data.split("/");
     const fullDate = `${ano}-${mes}-${dia}`;
 
@@ -40,20 +30,20 @@ export class ScheduleService {
       throw new ZodError("As datas ou horas fornecidas são inválidas.");
     }
 
-    if (!startDateTimeString || !endDateTimeString) {
-      throw new ZodError("As datas ou horas fornecidas são inválidas. 2");
-    }
-
     if (startDateTimeString.isAfter(endDateTimeString)) {
       throw new ZodError(
         "A hora de início não pode ser igual ou posterior à hora de término."
       );
     }
+
+    const startISO = startDateTimeString.toISOString();
+    const endISO = endDateTimeString.toISOString();
+
     const hasConflict =
       await this.googleCalendarService.handleCalendarConflicts(
         userId,
-        startDateTimeString.toISOString(),
-        endDateTimeString.toISOString()
+        startISO,
+        endISO
       );
 
     if (hasConflict) {
@@ -73,29 +63,46 @@ export class ScheduleService {
       }
     });
 
-    const daysOfWork = await prisma.schedule.create({
+    const createDaysOfWork = await prisma.schedule.create({
       data: {
         userId,
         date: new Date(fullDate),
-        startTime: new Date(startDateTimeString.toISOString()),
-        endTime: new Date(endDateTimeString.toString()),
+        startTime: new Date(startISO),
+        endTime: new Date(endISO),
       },
     });
 
-    const googleEventId =
-      await this.googleCalendarService.createCalendarEventForBarber(
-        userId,
-        "Horário disponível",
-        startDateTimeString.toISOString(),
-        endDateTimeString.toISOString()
-      );
+    try {
+      const event =
+        await this.googleCalendarService.createCalendarEventForBarber(
+          userId,
+          "Horário Disponível",
+          startISO,
+          endISO
+        );
 
-    await prisma.schedule.update({
-      where: { id: daysOfWork.id },
-      data: { googleEventId },
+      await prisma.schedule.update({
+        where: { id: createDaysOfWork.id },
+        data: {
+          googleEventId: event.id,
+        },
+      });
+
+      const updated: unknown = prisma.schedule.findUnique({
+        where: { id: createDaysOfWork.id },
+      });
+
+      return updated as ISchedule;
+    } catch (error) {
+      await prisma.schedule.delete({ where: { id: createDaysOfWork.id } });
+      throw new AppError(500, "Internal server error");
+    }
+  };
+
+  listSchedule = async (userId: number) => {
+    return await prisma.schedule.findMany({
+      where: { userId, isAvailable: true },
     });
-
-    return daysOfWork;
   };
 
   listBarberSchedule = async (userId: number) => {
@@ -156,19 +163,52 @@ export class ScheduleService {
       "YYYY-MM-DD HH:mm"
     ).toISOString();
 
+    const conflict = await this.googleCalendarService.handleCalendarConflicts(
+      barberId,
+      startISO,
+      endISO
+    );
+
+    if (conflict && conflict.id != schedule.googleEventId) {
+      throw new ZodError("O horário escolhido conflita com outro agendamento.");
+    }
+
     const updatedEvent = {
       summary: "Horário disponível",
       startISO: startISO,
       endISO: endISO,
     };
 
-    await this.googleCalendarService.updateCalendarEventForBarber(
-      barberId,
-      schedule.googleEventId!,
-      updatedEvent
-    );
+    if (schedule.googleEventId) {
+      await this.googleCalendarService.updateCalendarEventForBarber(
+        barberId,
+        schedule.googleEventId,
+        updatedEvent
+      );
+    } else {
+      try {
+        const event =
+          await this.googleCalendarService.createCalendarEventForBarber(
+            barberId,
+            "Horário Disponível",
+            startISO,
+            endISO
+          );
+        await prisma.schedule.update({
+          where: { id: scheduleId },
+          data: {
+            googleEventId: event.id,
+          },
+        });
+      } catch (error) {
+        throw new AppError(
+          500,
+          "Falha ao criar evento no Google Calendar durante update."
+        );
+      }
+    }
 
-    return await prisma.schedule.update({
+    const updatedDatabase = await prisma.schedule.update({
       where: { id: scheduleId },
       data: {
         date: new Date(fullDate),
@@ -176,17 +216,12 @@ export class ScheduleService {
         endTime: new Date(endISO),
       },
     });
+
+    return updatedDatabase;
   };
 
-  getScheduleTimeClient = async (
-    userId: number,
-    date: string,
-    startTime: string
-  ): Promise<IUserReturn> => {
-    const data = this.listBarberScheduleByUser(userId);
-
-    console.log(data);
-
+  getScheduleTimeClient = async (userId: number): Promise<IUserReturn> => {
+    const data = await this.listBarberScheduleByUser(userId);
     return data;
   };
 
@@ -195,18 +230,22 @@ export class ScheduleService {
       where: { id: scheduleId },
     });
 
-    if (!schedule) throw new Error("Horário não encontrado");
+    if (!schedule) throw new ZodError("Horário não encontrado");
 
     if (schedule.googleEventId) {
-      await this.googleCalendarService.deleteCalendarEventForBarber(
-        schedule.userId,
-        schedule.googleEventId
-      );
+      try {
+        await this.googleCalendarService.deleteCalendarEventForBarber(
+          schedule.userId,
+          schedule.googleEventId
+        );
+      } catch (error) {
+        throw new AppError(500, "Falha ao deletar evento no Google Calendar.");
+      }
     }
 
     await prisma.schedule.delete({
       where: { id: scheduleId },
     });
-    return true;
+    return { deleted: true, id: scheduleId };
   };
 }

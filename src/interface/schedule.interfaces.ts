@@ -5,4 +5,5 @@ export interface ISchedule {
   startTime: Date;
   endTime: Date;
   isAvailable?: boolean;
+  googleEventId?: string | null;
 }
