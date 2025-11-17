@@ -4,10 +4,18 @@ import { ISchedule } from "../interface/schedule.interfaces";
 import { IUserReturn } from "../interface/user.interfaces";
 import { AppError, ZodError } from "../errors/AppError";
 import { GoogleCalendarService } from "./GoogleCalendarService";
-import { oAuthClientFromTokens } from "../oAuth2/oAuth2.middleware";
+
+
+
 
 export class ScheduleService {
-  private googleCalendarService = new GoogleCalendarService();
+  constructor(private readonly googleCalendarService: GoogleCalendarService) {}
+
+  listSchedule = async (userId: number) => {
+    return await prisma.schedule.findMany({
+      where: { userId, isAvailable: true },
+    });
+  };
 
   createSchedule = async (
     userId: number,
@@ -15,6 +23,7 @@ export class ScheduleService {
     startTime: string,
     endTime: string
   ): Promise<ISchedule> => {
+    
     const [dia, mes, ano] = data.split("/");
     const fullDate = `${ano}-${mes}-${dia}`;
 
@@ -89,12 +98,6 @@ export class ScheduleService {
     return daysOfWork;
   };
 
-  listSchedule = async (userId: number) => {
-    return await prisma.schedule.findMany({
-      where: { userId, isAvailable: true },
-    });
-  };
-
   listBarberSchedule = async (userId: number) => {
     return await this.googleCalendarService.listCalendarEventsForBarber(userId);
   };
@@ -152,8 +155,6 @@ export class ScheduleService {
       `${fullDate} ${newEnd}`,
       "YYYY-MM-DD HH:mm"
     ).toISOString();
-
-    const calendar = new GoogleCalendarService();
 
     const updatedEvent = {
       summary: "Horário disponível",
