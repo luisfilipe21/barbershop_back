@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { google } from "googleapis";
 import { prisma } from "../config/database";
-import { oAuthClientFromTokens } from "./oAuth2.middleware";
+import { getGoogleOAuthClient } from "../utils/googleClient";
 
 export class CalendarController {
   constructor() {
@@ -15,7 +15,7 @@ export class CalendarController {
     if (!barber || !barber.googleTokens)
       throw new Error("Barber not connected to Google");
 
-    const client = oAuthClientFromTokens(barber.googleTokens as any);
+    const client = getGoogleOAuthClient();
 
     (client as any).on &&
       (client as any).on("tokens", async (tokens: any) => {
