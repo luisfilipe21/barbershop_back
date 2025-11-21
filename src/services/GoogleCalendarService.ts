@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import { prisma } from "../config/database";
-import { oAuthClientFromTokens } from "../oAuth2/oAuth2.middleware";
+import { getGoogleOAuthClient } from "../utils/googleClient";
 
 type CalendarEventItem = {
   id: string;
@@ -10,11 +10,9 @@ type CalendarEventItem = {
 };
 
 export class GoogleCalendarService {
-  private calendar = google.calendar({ version: "v3", auth: this.auth });
-
-  constructor(private readonly calendarId: string, private readonly auth: any) {
-    this.calendar = google.calendar({ version: "v3", auth });
-  }
+  private calendarClientForAuth = (auth: any) => {
+    return google.calendar({ version: "v3", auth: auth });
+  };
 
   getAuth = async (barberId: number) => {
     const barber = await prisma.barber.findUnique({
@@ -25,10 +23,9 @@ export class GoogleCalendarService {
       throw new Error("Barbeiro não conectado ao Google Calendar");
     }
 
-    const auth = oAuthClientFromTokens(barber.googleTokens as any);
-    this.calendar = google.calendar({ version: "v3", auth });
-
-    return auth;
+    const client = getGoogleOAuthClient();
+    client.setCredentials(barber.googleTokens as any);
+    return client;
   };
 
   listCalendarEventsForBarberBetween = async (
@@ -36,10 +33,11 @@ export class GoogleCalendarService {
     timeMinISO: string,
     timeMaxISO: string
   ) => {
-    await this.getAuth(barberId);
+    const auth = await this.getAuth(barberId);
+    const calendar = this.calendarClientForAuth(auth);
 
-    const events = await this.calendar.events.list({
-      calendarId: this.calendarId,
+    const events = await calendar.events.list({
+      calendarId: "primary",
       timeMin: timeMinISO,
       timeMax: timeMaxISO,
       maxResults: 100,
@@ -63,7 +61,8 @@ export class GoogleCalendarService {
     startISO: string,
     endISO: string
   ) => {
-    await this.getAuth(barberId);
+    const auth = await this.getAuth(barberId);
+    const calendar = this.calendarClientForAuth(auth);
 
     const event = {
       summary,
@@ -71,8 +70,8 @@ export class GoogleCalendarService {
       end: { dateTime: endISO, timeZone: "America/Sao_Paulo" },
     };
 
-    const created = await this.calendar.events.insert({
-      calendarId: this.calendarId,
+    const created = await calendar.events.insert({
+      calendarId: "primary",
       requestBody: event,
     });
 
@@ -88,10 +87,24 @@ export class GoogleCalendarService {
       endISO: string;
     }
   ) => {
-    await this.getAuth(barberId);
+    const auth = await this.getAuth(barberId);
+    const calendar = this.calendarClientForAuth(auth);
 
-    const response = await this.calendar.events.patch({
-      calendarId: this.calendarId,
+    const requestBody: any = {};
+    if (update.summary !== undefined) requestBody.summary = update.summary;
+    if (update.startISO)
+      requestBody.start = {
+        dateTime: update.startISO,
+        timeZone: "America/Sao_Paulo",
+      };
+    if (update.endISO)
+      requestBody.end = {
+        dateTime: update.endISO,
+        timeZone: "America/Sao_Paulo",
+      };
+
+    const response = await calendar.events.patch({
+      calendarId: "primary",
       eventId,
       requestBody: update,
     });
@@ -99,10 +112,11 @@ export class GoogleCalendarService {
   };
 
   deleteCalendarEventForBarber = async (barberId: number, eventId: string) => {
-    await this.getAuth(barberId);
+    const auth = await this.getAuth(barberId);
+    const calendar = this.calendarClientForAuth(auth);
 
-    await this.calendar.events.delete({
-      calendarId: this.calendarId,
+    await calendar.events.delete({
+      calendarId: "primary",
       eventId,
     });
 
@@ -137,9 +151,11 @@ export class GoogleCalendarService {
       const evEnd = ev.end?.dateTime
         ? new Date(ev.end.dateTime).getTime()
         : null;
+
       if (!evStart || !evEnd) continue;
 
       const overlap = start < evEnd && end > evStart;
+
       if (overlap) {
         return {
           id: ev.id,

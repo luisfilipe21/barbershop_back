@@ -1,10 +1,10 @@
 import { prisma } from "../config/database";
 import { google } from "googleapis";
-import { getOAuthClient } from "./oAuth2.middleware";
+import { getGoogleOAuthClient } from "../utils/googleClient";
 
 export class AuthService {
   getGoogleAuthUrl() {
-    const oauth2Client = getOAuthClient();
+    const oauth2Client = getGoogleOAuthClient();
 
     return oauth2Client.generateAuthUrl({
       access_type: "offline",
@@ -19,7 +19,7 @@ export class AuthService {
   }
 
   async handleGoogleCallback(code: string) {
-    const oauth2Client = getOAuthClient();
+    const oauth2Client = getGoogleOAuthClient();
 
     const { tokens } = await oauth2Client.getToken(code);
     if (!tokens) throw new Error("Missing tokens from Google");

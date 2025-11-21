@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { AuthService } from "../utils/auth.service";
+import { AuthService } from "../services/auth.service";
 
 export class OAuthController {
   private authService = new AuthService();
@@ -11,7 +11,7 @@ export class OAuthController {
 
   googleCallback = async (req: Request, res: Response): Promise<void> => {
     try {
-      const code = req.query.code as string;
+      const code = String(req.query.code) || "";
       if (!code) res.status(400).send("Missing code");
 
       await this.authService.handleGoogleCallback(code);
