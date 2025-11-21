@@ -2,9 +2,13 @@ import { Request, Response } from "express";
 import { ScheduleService } from "../services/schedule.services";
 import moment from "moment";
 import { ISchedule } from "../interface/schedule.interfaces";
+import { GoogleCalendarService } from "../services/GoogleCalendarService";
 
+export const googleCalendarService = new GoogleCalendarService(
+  process.env.GOOGLE_CALENDAR_ID!
+);
 export class ScheduleController {
-  private scheduleService = new ScheduleService();
+  private scheduleService = new ScheduleService(googleCalendarService);
 
   create = async (req: Request, res: Response) => {
     const userId = res.locals.decodedAccountData.sub;

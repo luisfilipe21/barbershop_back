@@ -9,13 +9,13 @@ const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI as string;
 
 if (!CLIENT_ID || !CLIENT_SECRET || !REDIRECT_URI) {
   throw new Error(
-    "Missing Google OAuth env vars. Set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET and GOOGLE_REDIRECT_URI."
+    "Missing Google OAuth env vars. Set GOOGLE CLIENT ID, GOOGLE CLIENT SECRET and GOOGLE REDIRECT URI."
   );
 }
 
-const SCOPES = ["https://www.googleapis.com/auth/calendar"];
+const SCOPES = ["https://www.googleapis.com/auth/calendar", "https://www.googleapis.com/auth/calendar.events"];
 
-export const createOAuthClient = () => {
+export const getOAuthClient = () => {
   const oAuth2Client = new google.auth.OAuth2(
     CLIENT_ID,
     CLIENT_SECRET,
@@ -24,8 +24,15 @@ export const createOAuthClient = () => {
   return oAuth2Client;
 };
 
+export const oAuthClientFromTokens = (tokens: any) => {
+  const client = getOAuthClient();
+  client.setCredentials(tokens);
+  return client;
+};
+
+
 export const getAuthUrl = () => {
-  const client = createOAuthClient();
+  const client = getOAuthClient();
   return client.generateAuthUrl({
     access_type: "offline",
     scope: SCOPES,
@@ -33,8 +40,3 @@ export const getAuthUrl = () => {
   });
 };
 
-export const oAuthClientFromTokens = (tokens: any) => {
-  const client = createOAuthClient();
-  client.setCredentials(tokens);
-  return client;
-};

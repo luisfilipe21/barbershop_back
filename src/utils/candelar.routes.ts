@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { OAuthController } from './oAuth.controller';
+import { OAuthController } from '../controllers/oAuth.controller';
 import { prisma } from '../config/database';
 import { CalendarController } from './calendar.controller';
 
