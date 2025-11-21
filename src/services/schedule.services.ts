@@ -8,12 +8,19 @@ import { GoogleCalendarService } from "./GoogleCalendarService";
 export class ScheduleService {
   constructor(private readonly googleCalendarService: GoogleCalendarService) {}
 
+  listSchedule = async (userId: number) => {
+    return await prisma.schedule.findMany({
+      where: { userId, isAvailable: true },
+    });
+  };
+  
   createSchedule = async (
     userId: number,
     data: string,
     startTime: string,
     endTime: string
   ): Promise<ISchedule> => {
+    
     const [dia, mes, ano] = data.split("/");
     const fullDate = `${ano}-${mes}-${dia}`;
 
@@ -88,22 +95,16 @@ export class ScheduleService {
         },
       });
 
-      const updated: unknown = prisma.schedule.findUnique({
+      return await prisma.schedule.findUnique({
         where: { id: createDaysOfWork.id },
-      });
+      }) as ISchedule;
 
-      return updated as ISchedule;
     } catch (error) {
       await prisma.schedule.delete({ where: { id: createDaysOfWork.id } });
       throw new AppError(500, "Internal server error");
     }
   };
 
-  listSchedule = async (userId: number) => {
-    return await prisma.schedule.findMany({
-      where: { userId, isAvailable: true },
-    });
-  };
 
   listBarberSchedule = async (userId: number) => {
     return await this.googleCalendarService.listCalendarEventsForBarber(userId);

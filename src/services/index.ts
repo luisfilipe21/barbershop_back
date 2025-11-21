@@ -1,5 +1,7 @@
 import { GoogleCalendarService } from "./GoogleCalendarService";
+import { ScheduleService } from "./schedule.services";
 
-export const googleCalendarService = new GoogleCalendarService(
-    process.env.GOOGLE_CALENDAR_ID as string,
-);
+const googleCalendarService = new GoogleCalendarService();
+const scheduleService = new ScheduleService(googleCalendarService);
+
+export { googleCalendarService, scheduleService };

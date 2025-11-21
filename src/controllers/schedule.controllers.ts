@@ -3,36 +3,35 @@ import { ScheduleService } from "../services/schedule.services";
 import moment from "moment";
 import { ISchedule } from "../interface/schedule.interfaces";
 import { GoogleCalendarService } from "../services/GoogleCalendarService";
+import { scheduleService } from "../services";
 
-export const googleCalendarService = new GoogleCalendarService(
-  process.env.GOOGLE_CALENDAR_ID!
-);
 export class ScheduleController {
-  private scheduleService = new ScheduleService(googleCalendarService);
-
   create = async (req: Request, res: Response) => {
-    const userId = res.locals.decodedAccountData.sub;
+    try {
+      const userId = res.locals.decodedAccountData.sub;
+      if (!userId) res.status(401).json({ error: "Unauthorized" });
 
-    if (!userId) res.status(401).json({ error: "Unauthorized" });
+      const { date, startTime, endTime } = req.body;
 
-    const { date, startTime, endTime } = req.body;
+      if (!date || !startTime || !endTime)
+        res.status(400).json({ error: "Bad Request" });
 
-    if (!date || !startTime || !endTime)
-      res.status(400).json({ error: "Bad Request" });
-
-    const schedule = await this.scheduleService.createSchedule(
-      Number(userId),
-      date,
-      startTime,
-      endTime
-    );
-    res.status(201).json(schedule);
+      const schedule = await scheduleService.createSchedule(
+        Number(userId),
+        date,
+        startTime,
+        endTime
+      );
+      res.status(201).json(schedule);
+    } catch (error) {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   };
 
   updateAvailability = async (req: Request, res: Response) => {
     const { isAvailable } = req.body;
     const barberId = Number(res.locals.decodedAccountData.sub);
-    const updatedSchedule = await this.scheduleService.updateAvailability(
+    const updatedSchedule = await scheduleService.updateAvailability(
       barberId,
       isAvailable
     );
@@ -43,7 +42,7 @@ export class ScheduleController {
   getBarberSchedule = async (req: Request, res: Response) => {
     const barberId = Number(req.params.id);
 
-    const schedule = await this.scheduleService.listSchedule(barberId);
+    const schedule = await scheduleService.listSchedule(barberId);
     const getTimeNow = new Date();
     const timeNow = moment(getTimeNow, "HH:mm:ss").format("HH:mm");
     const isTimeAvailable: ISchedule[] = [];
@@ -68,9 +67,10 @@ export class ScheduleController {
 
   getBarberScheduleByUser = async (req: Request, res: Response) => {
     const barberId = req.body.userId;
-    const fetchBarberSchedule =
-      await this.scheduleService.listBarberScheduleByUser(barberId);
-    console.log(fetchBarberSchedule);
+    const fetchBarberSchedule = await scheduleService.listBarberScheduleByUser(
+      barberId
+    );
+
     const getTimeNow = new Date();
     const timeNow = moment(getTimeNow, "HH:mm:ss").format("HH:mm");
     const isTimeAvailable: ISchedule[] = [];
@@ -104,7 +104,7 @@ export class ScheduleController {
     const barberId = req.body.userId;
 
     const fetchBarberSchedule =
-      await this.scheduleService.listBarberScheduleByUser(barberId);
+      await scheduleService.listBarberScheduleByUser(barberId);
 
     const getTimeNow = new Date();
     const timeNow = moment(getTimeNow, "HH:mm:ss").format("HH:mm");
